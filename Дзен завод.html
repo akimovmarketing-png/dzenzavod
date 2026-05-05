@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Контент-фабрика для Дзена · Акимов маркетинг</title>
+<script>document.documentElement.classList.add('js-on');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0F;--surface:#14141C;--surface-2:#1A1A24;
+  --border:#1F1F2A;--border-strong:#2D2D3D;
+  --mint:#8AF0D7;--mint-soft:rgba(138,240,215,.12);--mint-line:rgba(138,240,215,.35);
+  --indigo:#818CF8;--indigo-soft:rgba(129,140,248,.12);
+  --text:#F4F4F8;--text-muted:#8A8A99;--text-dim:#4D4D5C;
+  --serif:'Lora',Georgia,serif;
+  --sans:'Manrope',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --pad-x:80px;--pad-y:80px;
+  --max-w:1180px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11';font-weight:400}
+body{min-height:100vh;min-height:100dvh}
+a{color:inherit;text-decoration:none}
+
+.deck{scroll-snap-type:y mandatory;overflow-y:auto;height:100vh;height:100dvh;scroll-behavior:smooth}
+.deck::-webkit-scrollbar{width:0;height:0}.deck{scrollbar-width:none}
+
+.slide{position:relative;scroll-snap-align:start;scroll-snap-stop:always;min-height:100vh;min-height:100dvh;padding:var(--pad-y) var(--pad-x);display:flex;flex-direction:column;background:radial-gradient(1000px 500px at 80% -10%,var(--indigo-soft),transparent 60%),radial-gradient(800px 400px at -10% 110%,var(--mint-soft),transparent 60%),var(--bg);overflow:hidden}
+.slide::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:96px 96px;background-position:-1px -1px;opacity:.3;-webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,#000 10%,transparent 75%);mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,#000 10%,transparent 75%);pointer-events:none}
+
+.slide-chrome-top{position:absolute;left:var(--pad-x);right:var(--pad-x);top:32px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--text-muted);text-transform:uppercase;z-index:5;pointer-events:none}
+.brand{color:var(--text);font-weight:500}
+.brand .dot{display:inline-block;width:5px;height:5px;background:var(--mint);border-radius:50%;margin-right:7px;vertical-align:middle;box-shadow:0 0 10px var(--mint)}
+
+.nav{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:6px;z-index:100}
+.nav button{width:42px;height:42px;background:rgba(20,20,28,.85);border:1px solid var(--border-strong);color:var(--text);font:inherit;cursor:pointer;border-radius:2px;transition:all 200ms ease;display:flex;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.nav button:hover{border-color:var(--mint);color:var(--mint)}
+.nav button:active{transform:scale(.95)}
+.nav button svg{width:16px;height:16px}
+
+.progress-fixed{position:fixed;top:0;left:0;right:0;height:2px;background:transparent;z-index:50;pointer-events:none}
+.progress-fixed span{display:block;height:100%;background:var(--mint);width:9.09%;transition:width 400ms cubic-bezier(.2,.8,.2,1);box-shadow:0 0 12px var(--mint)}
+
+.counter{position:fixed;top:14px;right:20px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--text-muted);text-transform:uppercase;z-index:50;background:rgba(10,10,15,.6);padding:5px 9px;border:1px solid var(--border);border-radius:2px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.counter b{color:var(--text);font-weight:500}
+
+.content{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;max-width:var(--max-w);margin:0 auto;width:100%;justify-content:center;padding:24px 0}
+
+/* TYPOGRAPHY — Lora classical: regular for body, italic only for accents and numerics */
+.display{font-family:var(--serif);font-weight:500;font-size:clamp(40px,5.6vw,80px);line-height:1.05;letter-spacing:-.02em;color:var(--text)}
+.display .mint,.heading .mint,.subhead .mint{color:var(--mint);font-style:italic;font-weight:400}
+.heading{font-family:var(--serif);font-weight:500;font-size:clamp(28px,3.6vw,52px);line-height:1.1;letter-spacing:-.012em;color:var(--text)}
+.subhead{font-family:var(--serif);font-weight:500;font-size:clamp(22px,2.4vw,32px);line-height:1.15;color:var(--text)}
+.lede{font-family:var(--sans);font-weight:300;font-size:clamp(14px,1.05vw,17px);line-height:1.55;color:var(--text-muted);max-width:680px}
+.lede strong{color:var(--text);font-weight:500}
+.label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);font-weight:400}
+
+.row{display:flex;gap:24px;flex-wrap:wrap}
+.col{display:flex;flex-direction:column}
+.gap-md{gap:18px}.gap-lg{gap:32px}.gap-xl{gap:48px}
+.mt-sm{margin-top:18px}.mt-md{margin-top:24px}.mt-lg{margin-top:40px}.mt-xl{margin-top:56px}
+.rule{height:1px;background:var(--border-strong);width:100%}
+
+.kl{display:flex;align-items:center;gap:12px}
+.kl .l{height:1px;width:20px;background:var(--mint)}
+.kl .t{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mint)}
+
+/* generic card */
+.card{border:1px solid var(--border);background:linear-gradient(180deg,rgba(20,20,28,.55) 0%,rgba(10,10,15,0) 100%);padding:24px;display:flex;flex-direction:column;gap:12px}
+.card .num{font-family:var(--mono);font-size:10px;color:var(--mint);letter-spacing:.16em}
+.card .title{font-family:var(--serif);font-weight:500;font-size:clamp(19px,1.6vw,23px);line-height:1.15;letter-spacing:-.005em}
+.card .desc{font-family:var(--sans);font-weight:300;font-size:13px;line-height:1.55;color:var(--text-muted)}
+
+/* slide 02 stat-grid */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border-strong)}
+.stat-grid .cell{padding:28px 26px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:14px;background:linear-gradient(180deg,rgba(20,20,28,.4),transparent)}
+.stat-grid .cell:last-child{border-right:none}
+.stat-grid .cell .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mint)}
+.stat-grid .cell .h{font-family:var(--serif);font-weight:500;font-size:clamp(24px,2.4vw,34px);line-height:1.1;color:var(--text);letter-spacing:-.005em}
+.stat-grid .cell .h em{font-style:italic;font-weight:400}
+.stat-grid .cell .d{font-family:var(--sans);font-weight:300;font-size:13px;line-height:1.55;color:var(--text-muted)}
+
+/* slide 03 problem stats */
+.prob-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.prob-cell{display:flex;flex-direction:column;gap:8px;padding:18px 0}
+.prob-cell .fig{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(36px,3.6vw,52px);line-height:1;letter-spacing:-.02em;color:var(--text);font-feature-settings:'tnum'}
+.prob-cell .fig .unit{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--text-muted);letter-spacing:.1em;margin-left:6px;vertical-align:top;position:relative;top:.4em}
+.prob-cell .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted)}
+
+/* pillars */
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--border-strong)}
+.pillars .pillar{padding:24px 22px 8px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:10px}
+.pillars .pillar:last-child{border-right:none}
+.pillars .pillar .n{font-family:var(--mono);font-size:10px;color:var(--mint);letter-spacing:.16em}
+.pillars .pillar .h{font-family:var(--serif);font-weight:500;font-size:clamp(19px,1.7vw,23px);line-height:1.15}
+.pillars .pillar .d{font-family:var(--sans);font-weight:300;font-size:12.5px;line-height:1.55;color:var(--text-muted)}
+
+/* knowledge-base blocks */
+.kbase{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border-strong)}
+.kbase .blk{padding:28px 24px;border-right:1px solid var(--border);background:linear-gradient(180deg,rgba(20,20,28,.4),transparent);display:flex;flex-direction:column;gap:14px}
+.kbase .blk:last-child{border-right:none}
+.kbase .blk .n{font-family:var(--mono);font-size:10px;color:var(--mint);letter-spacing:.16em}
+.kbase .blk .h{font-family:var(--serif);font-weight:500;font-size:clamp(20px,1.9vw,26px);line-height:1.15}
+.kbase .blk ul{list-style:none;display:flex;flex-direction:column;gap:9px;padding-left:0}
+.kbase .blk ul li{font-family:var(--sans);font-weight:300;font-size:12.5px;line-height:1.5;color:var(--text-muted);padding-left:12px;position:relative}
+.kbase .blk ul li::before{content:'';position:absolute;left:0;top:8px;width:5px;height:1px;background:var(--mint)}
+
+/* clusters */
+.cluster-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+
+/* unified pricing table (3 columns) */
+.ptable{width:100%;border-collapse:collapse}
+.ptable th,.ptable td{padding:18px 0;text-align:left}
+.ptable thead th{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);font-weight:400;padding:0 0 14px 0;border-bottom:1px solid var(--border-strong)}
+.ptable tbody tr{border-bottom:1px solid var(--border)}
+.ptable tbody tr:last-child{border-bottom:1px solid var(--border-strong)}
+.ptable .tier{font-family:var(--sans);font-weight:500;font-size:clamp(14px,1.2vw,17px);color:var(--text);width:32%}
+.ptable .tier .meta{display:block;font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.1em;color:var(--text-muted);margin-top:5px;text-transform:uppercase}
+.ptable .price{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(20px,2.2vw,30px);line-height:1;color:var(--text);font-feature-settings:'tnum';width:34%;padding-right:18px}
+.ptable .price .unit{display:inline-block;font-family:var(--mono);font-style:normal;font-size:10px;color:var(--text-muted);letter-spacing:.08em;margin-left:6px;vertical-align:middle;text-transform:uppercase}
+.ptable .price.mint{color:var(--mint)}
+.ptable thead th.col-r{text-align:left}
+
+/* cover-foot replaces highlight band */
+.highlight{border-left:1px solid var(--mint);padding:18px 22px;background:linear-gradient(90deg,var(--mint-soft),transparent 80%);display:flex;flex-direction:column;gap:6px}
+.highlight .figure{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(28px,3vw,40px);line-height:1;color:var(--mint);font-feature-settings:'tnum';letter-spacing:-.02em}
+.highlight .figure .unit{font-family:var(--mono);font-style:normal;font-size:12px;color:var(--text-muted);letter-spacing:.08em;margin-left:8px;vertical-align:middle}
+.highlight .desc{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted)}
+
+/* steps (next-step) */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.steps .step{padding:24px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(20,20,28,.4),transparent);display:flex;flex-direction:column;gap:11px}
+.steps .step .n{font-family:var(--mono);font-size:10px;color:var(--mint);letter-spacing:.16em}
+.steps .step .duration{font-family:var(--mono);font-size:10px;color:var(--indigo);letter-spacing:.14em}
+.steps .step .name{font-family:var(--serif);font-weight:500;font-size:clamp(20px,2vw,26px);line-height:1.15}
+.steps .step .desc{font-family:var(--sans);font-weight:300;font-size:12.5px;line-height:1.55;color:var(--text-muted)}
+
+/* big CTA */
+.cta-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:48px}
+.cta-big{display:inline-flex;align-items:center;gap:14px;padding:18px 32px;background:#F4F4F8;color:#0A0A0F;font-family:var(--sans);font-weight:600;font-size:clamp(15px,1.3vw,17px);letter-spacing:-.005em;border-radius:3px;text-decoration:none;transition:all .3s ease;box-shadow:0 8px 32px rgba(255,255,255,.08),0 0 0 1px rgba(244,244,248,.6)}
+.cta-big:hover{background:var(--mint);color:#0A0A0F;box-shadow:0 8px 32px rgba(138,240,215,.4),0 0 0 1px var(--mint);transform:translateY(-2px)}
+.cta-big .arrow{font-family:var(--mono);font-size:18px;transition:transform .3s ease}
+.cta-big:hover .arrow{transform:translateX(6px)}
+.cta-sub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted)}
+.cta-sub a{color:var(--mint);transition:color .2s}
+.cta-sub a:hover{color:var(--text)}
+
+/* COVER (slide 1) */
+.slide.cover .content{justify-content:center;gap:0;}
+.cover-top{display:flex;align-items:center;gap:12px;margin-bottom:auto;padding-top:8px;flex-wrap:wrap}
+.cover-top .pill{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border:1px solid var(--mint-line);border-radius:99px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mint)}
+.cover-top .pill::before{content:'';width:5px;height:5px;background:var(--mint);border-radius:50%;box-shadow:0 0 8px var(--mint)}
+.cover-top .product-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-left:auto}
+.cover-title{font-family:var(--serif);font-weight:500;font-size:clamp(48px,7vw,108px);line-height:1.0;letter-spacing:-.02em;color:var(--text)}
+.cover-title .mint{color:var(--mint);font-style:italic;font-weight:400}
+.cover-sub{font-family:var(--sans);font-weight:300;font-size:clamp(15px,1.2vw,19px);line-height:1.5;color:var(--text-muted);max-width:580px;margin-top:24px}
+.cover-sub strong{color:var(--text);font-weight:500}
+.cover-foot{margin-top:auto;padding-top:32px;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.cover-foot .item{padding:16px 0;border-right:1px solid var(--border);padding-right:20px}
+.cover-foot .item:last-child{border-right:none}
+.cover-foot .item .n{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(28px,2.6vw,36px);line-height:1;color:var(--text);font-feature-settings:'tnum'}
+.cover-foot .item .n .unit{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--text-muted);letter-spacing:.08em;margin-left:6px}
+.cover-foot .item .l{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-top:6px}
+
+/* CALCULATOR */
+.calc{display:flex;flex-direction:column;gap:20px;border:1px solid var(--border-strong);padding:28px;background:linear-gradient(180deg,rgba(20,20,28,.5),transparent)}
+.calc-slider{display:flex;flex-direction:column;gap:12px}
+.calc-slider .head{display:flex;justify-content:space-between;align-items:baseline}
+.calc-slider .head .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted)}
+.calc-slider .head .val{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(32px,3.6vw,48px);line-height:1;color:var(--mint);font-feature-settings:'tnum'}
+.calc-slider .head .val .unit{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--text-muted);letter-spacing:.1em;margin-left:7px;text-transform:uppercase}
+.calc-slider input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:2px;background:var(--border-strong);outline:none;cursor:pointer}
+.calc-slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;background:var(--mint);border-radius:50%;cursor:grab;box-shadow:0 0 10px var(--mint),0 0 0 4px rgba(138,240,215,.15);transition:all .2s}
+.calc-slider input[type=range]::-webkit-slider-thumb:active{cursor:grabbing;transform:scale(1.15)}
+.calc-slider input[type=range]::-moz-range-thumb{width:18px;height:18px;background:var(--mint);border:none;border-radius:50%;cursor:grab;box-shadow:0 0 10px var(--mint),0 0 0 4px rgba(138,240,215,.15)}
+.calc-slider .ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;color:var(--text-dim);letter-spacing:.1em;margin-top:2px}
+
+.calc-section{display:flex;flex-direction:column;gap:8px}
+.calc-section-title{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted)}
+.calc-section-title::before{content:'';width:4px;height:4px;background:var(--mint);border-radius:50%;box-shadow:0 0 6px var(--mint)}
+
+.calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0;border:1px solid var(--border)}
+.calc-grid.three{grid-template-columns:repeat(3,1fr)}
+.calc-grid .cell{padding:18px 20px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:6px;background:rgba(10,10,15,.4)}
+.calc-grid .cell:last-child{border-right:none}
+.calc-grid .cell .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted)}
+.calc-grid .cell .val{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(22px,2.4vw,32px);line-height:1;color:var(--text);font-feature-settings:'tnum'}
+.calc-grid .cell .val.mint{color:var(--mint)}
+.calc-grid .cell .val .unit{font-family:var(--mono);font-style:normal;font-size:10px;color:var(--text-muted);letter-spacing:.08em;margin-left:6px}
+.calc-grid .cell .meta{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.06em;margin-top:2px}
+.calc-grid .cell .val-static{font-family:var(--sans);font-style:normal;font-weight:400;font-size:clamp(13px,1.1vw,15px);line-height:1.4;color:var(--text)}
+
+.calc-bars{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.calc-bar{display:flex;flex-direction:column;gap:8px}
+.calc-bar .head{display:flex;justify-content:space-between;align-items:baseline}
+.calc-bar .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted)}
+.calc-bar .qual{font-family:var(--serif);font-style:italic;font-weight:400;font-size:18px;color:var(--mint)}
+.calc-bar .track{height:5px;background:var(--border-strong);position:relative;overflow:hidden}
+.calc-bar .track .fill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--indigo),var(--mint));width:8%;transition:width 600ms cubic-bezier(.2,.8,.2,1);box-shadow:0 0 12px var(--mint-line)}
+.calc-bar .note{font-family:var(--mono);font-size:9.5px;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase}
+
+/* ANALYTICS */
+.dash{display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:0;border:1px solid var(--border-strong);background:linear-gradient(180deg,rgba(20,20,28,.5),transparent)}
+.dash > div{padding:20px;border-right:1px solid var(--border);min-width:0}
+.dash > div:last-child{border-right:none}
+.dash .panel-title{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.dash .panel-title::before{content:'';width:4px;height:4px;background:var(--mint);border-radius:50%;box-shadow:0 0 6px var(--mint)}
+
+.dash-chart svg{width:100%;height:auto;display:block}
+.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px;border-top:1px solid var(--border);padding-top:14px}
+.dash-stats .s{display:flex;flex-direction:column;gap:3px}
+.dash-stats .s .lbl{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted)}
+.dash-stats .s .val{font-family:var(--serif);font-style:italic;font-weight:400;font-size:20px;color:var(--text);font-feature-settings:'tnum'}
+.dash-stats .s.mint .val{color:var(--mint)}
+.dash-stats .s.indigo .val{color:var(--indigo)}
+
+.dash-list{display:flex;flex-direction:column;font-size:12px}
+.dash-list .item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);gap:8px}
+.dash-list .item:last-child{border-bottom:none}
+.dash-list .item .src{display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:12px}
+.dash-list .item .src .ic{width:11px;height:11px;border-radius:2px;background:var(--mint);opacity:.75;flex-shrink:0}
+.dash-list .item .src .ic.i2{background:var(--indigo)}
+.dash-list .item .src .ic.i3{background:#E84A5F}
+.dash-list .item .src .ic.i4{background:#F4B400}
+.dash-list .item .src .ic.i5{background:#3B82F6}
+.dash-list .item .src .ic.i6{background:#A855F7}
+.dash-list .item .num-c{font-family:var(--mono);font-size:11px;color:var(--text);font-feature-settings:'tnum'}
+.dash-list .item .pct{font-family:var(--mono);font-size:10px;color:var(--mint);font-feature-settings:'tnum';margin-left:10px;min-width:40px;text-align:right}
+.dash-blur{filter:blur(3px);user-select:none}
+
+.utm-badge{display:flex;align-items:center;gap:14px;padding:14px 20px;border:1px solid var(--mint-line);background:linear-gradient(90deg,var(--mint-soft),transparent 70%);margin-top:18px}
+.utm-badge .icn{font-family:var(--mono);font-size:11px;color:var(--mint);letter-spacing:.16em;border:1px solid var(--mint-line);padding:4px 8px;border-radius:2px;flex-shrink:0}
+.utm-badge .txt{font-family:var(--sans);font-weight:300;font-size:13.5px;color:var(--text);line-height:1.5}
+.utm-badge .txt b{color:var(--mint);font-weight:500}
+
+/* PLATFORMS (slide 11) */
+.platforms{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px}
+.platform{padding:18px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(20,20,28,.5),transparent);display:flex;align-items:center;gap:10px}
+.platform .ic{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint)}
+.platform .ic.i2{background:var(--indigo);box-shadow:0 0 8px var(--indigo)}
+.platform .ic.i3{background:#E84A5F;box-shadow:0 0 8px rgba(232,74,95,.6)}
+.platform .ic.i4{background:#F4B400;box-shadow:0 0 8px rgba(244,180,0,.6)}
+.platform .ic.i5{background:#3B82F6;box-shadow:0 0 8px rgba(59,130,246,.6)}
+.platform .ic.i6{background:#A855F7;box-shadow:0 0 8px rgba(168,85,247,.6)}
+.platform .name{font-family:var(--serif);font-weight:500;font-size:17px;color:var(--text)}
+
+.ext-pillars{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border-strong)}
+.ext-pillar{padding:24px 26px;border-right:1px solid var(--border);background:linear-gradient(180deg,rgba(20,20,28,.4),transparent);display:flex;flex-direction:column;gap:10px}
+.ext-pillar:last-child{border-right:none}
+.ext-pillar .n{font-family:var(--mono);font-size:10px;color:var(--mint);letter-spacing:.16em}
+.ext-pillar .h{font-family:var(--serif);font-weight:500;font-size:clamp(20px,1.9vw,24px);line-height:1.15}
+.ext-pillar .d{font-family:var(--sans);font-weight:300;font-size:13px;line-height:1.55;color:var(--text-muted)}
+
+/* enter animations */
+.js-on .anim{opacity:0;transform:translateY(10px);transition:opacity 700ms cubic-bezier(.2,.7,.2,1),transform 700ms cubic-bezier(.2,.7,.2,1)}
+.js-on .slide.in-view .anim{opacity:1;transform:translateY(0)}
+.js-on .slide.in-view .anim.d1{transition-delay:80ms}
+.js-on .slide.in-view .anim.d2{transition-delay:170ms}
+.js-on .slide.in-view .anim.d3{transition-delay:260ms}
+.js-on .slide.in-view .anim.d4{transition-delay:350ms}
+.js-on .slide.in-view .anim.d5{transition-delay:440ms}
+
+/* responsive */
+@media (max-width:1100px){
+  :root{--pad-x:48px;--pad-y:64px}
+  .cluster-grid{grid-template-columns:repeat(2,1fr)}
+  .pillars,.kbase,.stat-grid,.ext-pillars{grid-template-columns:1fr}
+  .pillars .pillar,.kbase .blk,.stat-grid .cell,.ext-pillar{border-right:none;border-bottom:1px solid var(--border)}
+  .calc-grid,.calc-grid.three{grid-template-columns:repeat(2,1fr)}
+  .calc-grid .cell:nth-child(2n){border-right:none}
+  .dash{grid-template-columns:1fr}
+  .dash > div{border-right:none;border-bottom:1px solid var(--border)}
+  .dash > div:last-child{border-bottom:none}
+  .platforms{grid-template-columns:repeat(2,1fr)}
+  .prob-grid{grid-template-columns:repeat(2,1fr)}
+  .cover-foot{grid-template-columns:1fr}
+  .cover-foot .item{border-right:none;border-bottom:1px solid var(--border)}
+  .steps{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  :root{--pad-x:18px;--pad-y:54px}
+  .slide-chrome-top{left:18px;right:18px;top:16px}
+  .nav{right:12px;bottom:12px}.nav button{width:38px;height:38px}
+  .counter{top:10px;right:12px;font-size:9.5px;padding:4px 7px}
+  .cluster-grid{grid-template-columns:1fr}
+  .row{gap:14px}.gap-xl{gap:22px}
+  .mt-xl{margin-top:32px}.mt-lg{margin-top:24px}
+  .ptable th,.ptable td{padding:14px 0}
+  .ptable .price{font-size:18px}
+  .card{padding:18px}
+  .steps .step{padding:20px}
+  .calc{padding:20px;gap:16px}
+  .calc-grid,.calc-grid.three{grid-template-columns:1fr}
+  .calc-grid .cell{border-right:none;border-bottom:1px solid var(--border)}
+  .calc-grid .cell:last-child{border-bottom:none}
+  .calc-bars{grid-template-columns:1fr}
+  .dash-stats{grid-template-columns:1fr}
+  .platforms{grid-template-columns:1fr}
+  .prob-grid{grid-template-columns:1fr}
+  .cta-big{padding:16px 24px}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-fixed"><span id="progressBar"></span></div>
+<div class="counter"><b id="slideNum">01</b> / 11</div>
+
+<div class="deck" id="deck">
+
+<!-- 01 COVER -->
+<section class="slide cover" data-slide="1">
+  <div class="slide-chrome-top"><div class="brand"><span class="dot"></span>Акимов маркетинг · Контент-фабрика для Дзена</div></div>
+  <div class="content">
+    <div class="cover-top anim d1">
+      <span class="pill">Акимов маркетинг</span>
+      <span class="product-tag">B2B Proposal · 2026</span>
+    </div>
+    <h1 class="cover-title anim d2">Контент-фабрика<br><span class="mint">для&nbsp;</span>Дзена</h1>
+    <p class="cover-sub anim d3">Промышленная генерация SEO-статей под кластеры запросов клиента. <strong>8 уникальных материалов в день на канал</strong>.</p>
+    <div class="cover-foot anim d4">
+      <div class="item"><div class="n">8<span class="unit">ст / день / канал</span></div><div class="l">Уникальные SEO-статьи</div></div>
+      <div class="item"><div class="n">240<span class="unit">в&nbsp;месяц</span></div><div class="l">Объём на&nbsp;один канал</div></div>
+      <div class="item"><div class="n">до&nbsp;30<span class="unit">каналов</span></div><div class="l">Сетевой масштаб</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 CONTEXT -->
+<section class="slide" data-slide="2">
+  <div class="slide-chrome-top"><div class="brand"><span class="dot"></span>Акимов маркетинг · Контент-фабрика для Дзена</div></div>
+  <div class="content">
+    <div class="kl anim d1"><div class="l"></div><div class="t">Контекст · 02</div></div>
+    <h2 class="heading mt-md anim d2">Дзен&nbsp;— это не блог.<br>Это <span class="mint">поисковый трафик.</span></h2>
+    <div class="stat-grid mt-lg anim d3">
+      <div class="cell">
+        <div class="lbl">Аудитория</div>
+        <div class="h">Десятки <em>млн</em><br>читателей в&nbsp;месяц</div>
+        <div class="d">Активная аудитория Дзена по&nbsp;всей России — без отраслевых и&nbsp;географических потолков.</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Индексация</div>
+        <div class="h"><em>Яндекс.SERP</em></div>
+        <div class="d">Контент Дзена попадает в&nbsp;поисковую выдачу и&nbsp;собирает органический трафик по&nbsp;целевым запросам.</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Дистрибуция</div>
+        <div class="h"><em>Алгоритм</em><br>+ push</div>
+        <div class="d">Рекомендательная лента и&nbsp;пуши Дзена добавляют второй слой охвата поверх SEO.</div>
+      </div>
+    </div>
+    <p class="lede mt-md anim d4">Один материал — две аудитории сразу: внутренняя лента Дзена и&nbsp;органическая выдача Яндекса по&nbsp;целевым запросам.</p>
+  </div>
+</section>
+
+<!-- 03 PROBLEM -->
+<section class="slide" data-slide="3">
+  <div class="slide-chrome-top"><div class="brand"><span class="dot"></span>Акимов маркетинг · Контент-фабрика для Дзена</div></div>
+  <div class="content">
+    <div class="kl anim d1"><div class="l"></div><div class="t">Проблема · 03</div></div>
+    <h2 class="heading mt-md anim d2">Ручной SEO-контент<br><span class="mint">не масштабируется.</span></h2>
+    <div class="prob-grid mt-lg anim d3">
+      <div class="prob-cell"><div class="fig">1<span class="unit">статья/день</span></div><div class="lbl">Потолок одного райтера</div></div>
+      <div class="prob-cell"><div class="fig">5–15<span class="unit">тыс ₽/шт</span></div><div class="lbl">Рынок копирайта</div></div>
+      <div class="prob-cell"><div class="fig">100+<span class="unit">статей</span></div><div class="lbl">На один кластер для топа</div></div>
+      <div class="prob-cell"><div class="fig">3–6<span class="unit">мес</span></div><div class="lbl">До результата в SERP</div></div>
+    </div>
+    <p class="lede mt-md anim d4">Сотни статей × десятки людей × месяцы. Не вариант.</p>
+  </div>
+</section>
+
+<!-- 04 SOLUTION -->
+<section class="slide" data-slide="4">
+  <div class="slide-chrome-top"><div class="brand"><span class="dot"></span>Акимов маркетинг · Контент-фабрика для Дзена</div></div>
+  <div class="content">
+    <div class="kl anim d1"><div class="l"></div><div class="t">Решение · 04</div></div>
+    <h2 class="heading mt-md anim d2"><span class="mint">8</span> уникальных SEO-статей<br>в&nbsp;день. На&nbsp;канал.</h2>
+    <p class="lede mt-md anim d3">Кластеры запросов. RAG по&nbsp;фактуре бренда. Поддержка разработчиков на&nbsp;всём цикле.</p>
+    <div class="pillars mt-lg anim d4">
+      <div class="pillar"><div class="n">01 · Кластеры</div><div class="h">Семантика клиента</div><div class="d">Под каждый запрос — свой формат статьи.</div></div>
+      <div class="pillar"><div class="n">02 · Поток</div><div class="h">Промышленная&nbsp;генерация</div><div class="d">LLM + RAG + автоматизированная SEO-обработка.</div></div>
+      <div class="pillar"><div class="n">03 · Сетка</div><div class="h">От пилота к&nbsp;охвату</div><div class="d">От пилотного канала до сетки 30+.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 KNOWLEDGE BASE -->
+<section class="slide" data-slide="5">
+  <div class="slide-chrome-top"><div class="brand"><span class="dot"></span>Акимов маркетинг · Контент-фабрика для Дзена</div></div>
+  <div class="content">
+    <div class="kl anim d1"><div class="l"></div><div class="t">База знаний · 05</div></div>
+    <h2 class="heading mt-md anim d2">Своё позиционирование.<br><span class="mint">Своя стратегия.</span></h2>
+    <p class="lede mt-md anim d3">Под каждый канал собираем индивидуальную базу. Один продукт ≠ один промпт.</p>
+    <div class="kbase mt-lg anim d4">
+      <div class="blk">
+        <div class="n">01 · Фактура</div>
+        <div class="h">База знаний клиента</div>
+        <ul>
+          <li>Продуктовая база и&nbsp;прайсы</li>
+          <li>Кейсы, отзывы, документы</li>
+          <li>FAQ и&nbsp;скрипты продаж</li>
+          <li>Брендбук и&nbsp;tone&#8209;of&#8209;voice</li>
+        </ul>
+      </div>
+      <div class="blk">
+        <div class="n">02 · Позиционирование</div>
+        <div class="h">Уникальный угол канала</div>
+        <ul>
+          <li>УТП и&nbsp;ключевые сообщения</li>
+          <li>ICP — кто читатель канала</li>
+          <li>Тон и&nbsp;стиль публикаций</li>
+          <li>Конкурентное отличие</li>
+        </ul>
+      </div>
+      <div class="blk">
+        <div class="n">03 · Контент-стратегия</div>
+        <div class="h">План на&nbsp;240 статей/мес</div>
+        <ul>
+          <li>Распределение по&nbsp;кластерам</li>
+          <li>Тематические рубрики</li>
+          <li>Ритм и&nbsp;окна публикаций</li>
+          <li>Перелинковка внутри канала</li>
+        </ul>
+      </div>
+    </div>
+    <p class="lede mt-md anim d5">Из этой базы пишется каждая статья. Постоянно дообучается на&nbsp;новых материалах клиента.</p>
+  </div>
+</section>
+
+<!-- 06 CLUSTERS -->
+<section class="slide" data-slide="6">
+  <div class="slide-chrome-top"><div class="brand"><span class="dot"></span>Акимов маркетинг · Контент-фабрика для Дзена</div></div>
+  <div class="content">
+    <div class="kl anim d1"><div class="l"></div><div class="t">Кластеры · 06</div></div>
+    <h2 class="heading mt-md anim d2">Под каждый запрос&nbsp;—<br><span class="mint">свой тип статьи.</span></h2>
+    <div class="cluster-grid mt-lg anim d3">
+      <div class="card"><div class="num">01</div><div class="title">Коммерческие</div><div class="desc">«Купить», «цена». Прямой путь к&nbsp;заявке.</div></div>
+      <div class="card"><div class="num">02</div><div class="title">Информационные</div><div class="desc">«Как», «почему». Верх воронки и&nbsp;охват.</div></div>
+      <div class="card"><div class="num">03</div><div class="title">Целевые</div><div class="desc">Точный ICP — отрасль, роль, контекст.</div></div>
+      <div class="card"><div class="num">04</div><div class="title">Околоцелевые</div><div class="desc">Соседние ниши, смежные боли.</div></div>
+      <div class="card"><div class="num">05</div><div class="title">Брендовые</div><div class="desc">Защита SERP, перехват сравнений.</div></div>
+    </div>
+    <p class="lede mt-md anim d4">Один пайплайн — пять жанров на&nbsp;выходе.</p>
+  </div>
+</section>
+
+<!-- 07 CALCULATOR -->
+<section class="slide" data-slide="7">
+  <div class="slide-chrome-top"><div class="brand"><span class="dot"></span>Акимов маркетинг · Контент-фабрика для Дзена</div></div>
+  <div class="content">
+    <div class="kl anim d1"><div class="l"></div><div class="t">Экономика проекта · 07</div></div>
+    <h2 class="heading mt-md anim d2">Цифры под <span class="mint">ваш объём.</span></h2>
+    <div class="calc mt-lg anim d3">
+      <div class="calc-slider">
+        <div class="head">
+          <span class="lbl">Каналов в сетке</span>
+          <span class="val"><span id="cChannels">1</span><span class="unit">канал</span></span>
+        </div>
+        <input type="range" id="chSlider" min="1" max="30" value="1" step="1">
+        <div class="ticks"><span>1</span><span>10</span><span>20</span><span>30</span></div>
+      </div>
+
+      <div class="calc-section">
+        <div class="calc-section-title">Запуск · one-time</div>
+        <div class="calc-grid">
+          <div class="cell">
+            <div class="lbl">Стоимость запуска</div>
+            <div class="val mint"><span id="cDev">140 000</span><span class="unit">₽</span></div>
+            <div class="meta" id="cDevMeta">за&nbsp;канал · пилотный режим</div>
+          </div>
+          <div class="cell">
+            <div class="lbl">Что входит</div>
+            <div class="val val-static">Инфраструктура, обучение&nbsp;агентов, база знаний, ТЗ, интеграции</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-section">
+        <div class="calc-section-title">Ежемесячно</div>
+        <div class="calc-grid three">
+          <div class="cell">
+            <div class="lbl">Статей в&nbsp;месяц</div>
+            <div class="val"><span id="cArticles">240</span></div>
+          </div>
+          <div class="cell">
+            <div class="lbl">Сопровождение</div>
+            <div class="val"><span id="cMonthly">60 000</span><span class="unit">₽ / мес</span></div>
+          </div>
+          <div class="cell">
+            <div class="lbl">Цена 1 статьи</div>
+            <div class="val mint"><span id="cPerArticle">250</span><span class="unit">₽</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-bars">
+        <div class="calc-bar">
+          <div class="head">
+            <span class="lbl">Охват</span>
+            <span class="qual" id="cReachLabel">точечный</span>
+          </div>
+          <div class="track"><div class="fill" id="cReachBar"></div></div>
+          <div class="note">от ниши и качества контента</div>
+        </div>
+        <div class="calc-bar">
+          <div class="head">
+            <span class="lbl">Трафик на&nbsp;сайт</span>
+            <span class="qual" id="cTrafficLabel">десятки/мес</span>
+          </div>
+          <div class="track"><div class="fill" id="cTrafficBar"></div></div>
+          <div class="note">не гарантируем точные цифры</div>
+        </div>
+      </div>
+    </div>
+    <p class="lede mt-md anim d4">Точные цифры — где они измеримы. Индикаторы — где зависят от ниши и качества контента.</p>
+  </div>
+</section>
+
+<!-- 08 ANALYTICS -->
+<section class="slide" data-slide="8">
+  <div class="slide-chrome-top"><div class="brand"><span class="dot"></span>Акимов маркетинг · Контент-фабрика для Дзена</div></div>
+  <div class="content">
+    <div class="kl anim d1"><div class="l"></div><div class="t">Аналитика · 08</div></div>
+    <h2 class="heading mt-md anim d2">Прозрачно.<br>По <span class="mint">каждой статье.</span></h2>
+    <div class="utm-badge anim d3">
+      <span class="icn">UTM</span>
+      <span class="txt">Все статьи прошиваются <b>UTM-метками</b>&nbsp;— в&nbsp;дашборде видно источник каждого перехода.</span>
+    </div>
+    <div class="dash mt-md anim d4">
+      <div class="dash-chart">
+        <div class="panel-title">Переходы по&nbsp;дням · демо</div>
+        <svg viewBox="0 0 600 160" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="dashGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8AF0D7" stop-opacity=".35"/>
+              <stop offset="100%" stop-color="#8AF0D7" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <g stroke="#1F1F2A" stroke-width="1">
+            <line x1="0" y1="35" x2="600" y2="35"/>
+            <line x1="0" y1="80" x2="600" y2="80"/>
+            <line x1="0" y1="125" x2="600" y2="125"/>
+          </g>
+          <path d="M0,140 L20,138 L40,136 L60,130 L80,128 L100,120 L120,122 L140,115 L160,120 L180,108 L200,110 L220,98 L240,80 L260,90 L280,85 L300,75 L320,80 L340,72 L360,78 L380,62 L400,68 L420,58 L440,48 L460,42 L480,38 L500,22 L520,32 L540,30 L560,24 L580,34 L600,30 L600,160 L0,160 Z" fill="url(#dashGrad)"/>
+          <path d="M0,140 L20,138 L40,136 L60,130 L80,128 L100,120 L120,122 L140,115 L160,120 L180,108 L200,110 L220,98 L240,80 L260,90 L280,85 L300,75 L320,80 L340,72 L360,78 L380,62 L400,68 L420,58 L440,48 L460,42 L480,38 L500,22 L520,32 L540,30 L560,24 L580,34 L600,30" stroke="#8AF0D7" stroke-width="1.5" fill="none"/>
+          <circle cx="500" cy="22" r="3" fill="#8AF0D7"/>
+        </svg>
+        <div class="dash-stats">
+          <div class="s mint"><div class="lbl">Всего за период</div><div class="val">11 907</div></div>
+          <div class="s"><div class="lbl">Среднее в&nbsp;день</div><div class="val">212.6</div></div>
+          <div class="s indigo"><div class="lbl">Максимум</div><div class="val">678</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="panel-title">Источники переходов</div>
+        <div class="dash-list">
+          <div class="item"><div class="src"><span class="ic"></span>Pinterest</div><div><span class="num-c">4 234</span><span class="pct">35.6%</span></div></div>
+          <div class="item"><div class="src"><span class="ic i2"></span>Дзен</div><div><span class="num-c">4 216</span><span class="pct">35.4%</span></div></div>
+          <div class="item"><div class="src"><span class="ic i5"></span>Telegram</div><div><span class="num-c">892</span><span class="pct">7.5%</span></div></div>
+          <div class="item"><div class="src"><span class="ic i3"></span>Instagram</div><div><span class="num-c">879</span><span class="pct">7.4%</span></div></div>
+          <div class="item"><div class="src"><span class="ic i4"></span>YouTube</div><div><span class="num-c">517</span><span class="pct">4.3%</span></div></div>
+          <div class="item"><div class="src"><span class="ic i6"></span>Прочие</div><div><span class="num-c">412</span><span class="pct">3.5%</span></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="panel-title">Топ статей</div>
+        <div class="dash-list dash-blur">
+          <div class="item"><div class="src">━━━━━━━━━━━━━</div><div><span class="num-c">2 220</span><span class="pct">18.6%</span></div></div>
+          <div class="item"><div class="src">━━━━━━━━━━━</div><div><span class="num-c">1 203</span><span class="pct">10.1%</span></div></div>
+          <div class="item"><div class="src">━━━━━━━━━━━━</div><div><span class="num-c">1 196</span><span class="pct">10.0%</span></div></div>
+          <div class="item"><div class="src">━━━━━━━━━━</div><div><span class="num-c">887</span><span class="pct">7.4%</span></div></div>
+          <div class="item"><div class="src">━━━━━━━━━━━━━</div><div><span class="num-c">874</span><span class="pct">7.3%</span></div></div>
+          <div class="item"><div class="src">━━━━━━━━</div><div><span class="num-c">703</span><span class="pct">5.9%</span></div></div>
+        </div>
+      </div>
+    </div>
+    <p class="lede mt-md anim d5">Доступ к&nbsp;дашборду — у&nbsp;клиента. Срез по&nbsp;каждому каналу и&nbsp;каждой статье.</p>
+  </div>
+</section>
+
+<!-- 09 PRICING — UNIFIED TABLE -->
+<section class="slide" data-slide="9">
+  <div class="slide-chrome-top"><div class="brand"><span class="dot"></span>Акимов маркетинг · Контент-фабрика для Дзена</div></div>
+  <div class="content">
+    <div class="kl anim d1"><div class="l"></div><div class="t">Прайс · 09</div></div>
+    <h2 class="heading mt-md anim d2">Запуск<br>и <span class="mint">сопровождение.</span></h2>
+    <table class="ptable mt-lg anim d3">
+      <thead>
+        <tr>
+          <th>Объём</th>
+          <th class="col-r">Запуск · one-time</th>
+          <th class="col-r">Сопровождение</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="tier">1 канал<span class="meta">Пилотный режим</span></td>
+          <td class="price">140&nbsp;000<span class="unit">₽</span></td>
+          <td class="price">60&nbsp;000<span class="unit">₽ / мес</span></td>
+        </tr>
+        <tr>
+          <td class="tier">до 10 каналов<span class="meta">Стандарт</span></td>
+          <td class="price">75&nbsp;000<span class="unit">₽ / канал</span></td>
+          <td class="price">35&nbsp;000<span class="unit">₽ / мес / канал</span></td>
+        </tr>
+        <tr>
+          <td class="tier">11–20 каналов<span class="meta">Сетевой тариф</span></td>
+          <td class="price">70&nbsp;000<span class="unit">₽ / канал</span></td>
+          <td class="price">35&nbsp;000<span class="unit">₽ / мес / канал</span></td>
+        </tr>
+        <tr>
+          <td class="tier">21–30 каналов<span class="meta">Промышленный масштаб</span></td>
+          <td class="price mint">65&nbsp;000<span class="unit">₽ / канал</span></td>
+          <td class="price mint">35&nbsp;000<span class="unit">₽ / мес / канал</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="row mt-md anim d4" style="gap:18px;align-items:stretch">
+      <div class="highlight" style="flex:1.5">
+        <div class="desc">В&nbsp;сопровождение входит</div>
+        <p style="font-family:var(--sans);font-weight:300;font-size:13px;line-height:1.6;color:var(--text-muted);margin-top:6px"><strong style="color:var(--text);font-weight:500">8 уникальных SEO-статей в&nbsp;день на&nbsp;канал</strong>, ведение базы знаний канала, поддержка разработчиков, доступ к&nbsp;дашборду с&nbsp;UTM-аналитикой.</p>
+      </div>
+      <div class="highlight" style="flex:1">
+        <div class="desc">Цена 1 статьи на&nbsp;сетке</div>
+        <div class="figure">~146<span class="unit">₽ / шт</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 NEXT STEP -->
+<section class="slide" data-slide="10">
+  <div class="slide-chrome-top"><div class="brand"><span class="dot"></span>Акимов маркетинг · Контент-фабрика для Дзена</div></div>
+  <div class="content">
+    <div class="kl anim d1"><div class="l"></div><div class="t">Следующий шаг · 10</div></div>
+    <h2 class="heading mt-md anim d2">Полный запуск&nbsp;—<br><span class="mint">3–4 недели</span> до&nbsp;ритма.</h2>
+    <div class="steps mt-lg anim d3">
+      <div class="step">
+        <div class="n">01</div>
+        <div class="duration">~ 1–2 дня</div>
+        <div class="name">Бриф</div>
+        <div class="desc">Аудитория, ниша, продуктовая фактура, ключевые сегменты запросов.</div>
+      </div>
+      <div class="step">
+        <div class="n">02</div>
+        <div class="duration">~ 7–14 дней</div>
+        <div class="name">Запуск инфраструктуры</div>
+        <div class="desc">Обучение агентов и&nbsp;сценариев, база знаний, ТЗ, интеграции, шаблоны кластеров.</div>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <div class="duration">~ 2 недели</div>
+        <div class="name">Прогрев канала</div>
+        <div class="desc">Прогрев Дзена 3–5 дней, постепенный выход на&nbsp;8 публикаций/день.</div>
+      </div>
+    </div>
+    <div class="cta-wrap anim d4">
+      <a class="cta-big" href="https://t.me/akimovvai" target="_blank" rel="noopener">
+        <span>Обсудить условия и&nbsp;запуск</span>
+        <span class="arrow">→</span>
+      </a>
+      <div class="cta-sub">Сергей Акимов · <a href="https://t.me/akimovvai" target="_blank" rel="noopener">@akimovvai</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 EXTENSION -->
+<section class="slide" data-slide="11">
+  <div class="slide-chrome-top"><div class="brand"><span class="dot"></span>Акимов маркетинг · Контент-фабрика для Дзена</div></div>
+  <div class="content">
+    <div class="kl anim d1"><div class="l"></div><div class="t">Расширение · 11</div></div>
+    <h2 class="heading mt-md anim d2">И не только <span class="mint">Дзен.</span></h2>
+    <p class="lede mt-md anim d3">Контент-фабрика модульная. Стратегия адаптируется под каждую площадку — со&nbsp;своим форматом, тоном и&nbsp;ритмом публикаций.</p>
+    <div class="platforms mt-lg anim d4">
+      <div class="platform"><span class="ic"></span><span class="name">Pinterest</span></div>
+      <div class="platform"><span class="ic i3"></span><span class="name">Instagram</span></div>
+      <div class="platform"><span class="ic i2"></span><span class="name">TikTok</span></div>
+      <div class="platform"><span class="ic i4"></span><span class="name">YouTube</span></div>
+      <div class="platform"><span class="ic i5"></span><span class="name">Telegram</span></div>
+      <div class="platform"><span class="ic"></span><span class="name">Threads</span></div>
+      <div class="platform"><span class="ic i6"></span><span class="name">Habr / Pikabu</span></div>
+      <div class="platform"><span class="ic i2"></span><span class="name">и&nbsp;другие</span></div>
+    </div>
+    <div class="ext-pillars mt-lg anim d5">
+      <div class="ext-pillar">
+        <div class="n">+ Визуал</div>
+        <div class="h">Генерация визуала высокого качества</div>
+        <div class="d">Изображения, обложки, карусели, видео-нарезки — под каждую площадку свой формат и&nbsp;соотношение сторон.</div>
+      </div>
+      <div class="ext-pillar">
+        <div class="n">+ Дистрибуция</div>
+        <div class="h">Автоматизированное распространение</div>
+        <div class="d">Публикация по&nbsp;расписанию, кросспостинг между площадками, очередь под каждый канал.</div>
+      </div>
+    </div>
+    <p class="lede mt-md anim d5">Опционально, по&nbsp;запросу. Дополнительные модули — обсуждаются индивидуально.</p>
+  </div>
+</section>
+
+</div>
+
+<div class="nav">
+  <button id="navUp" aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 15l6-6 6 6"/></svg></button>
+  <button id="navDown" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></button>
+</div>
+
+<script>
+(function(){
+try{
+  const deck=document.getElementById('deck');
+  const slides=Array.from(document.querySelectorAll('.slide'));
+  const total=slides.length;
+  const numEl=document.getElementById('slideNum');
+  const barEl=document.getElementById('progressBar');
+  let current=0;
+
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting&&entry.intersectionRatio>=0.5){
+        entry.target.classList.add('in-view');
+        const idx=slides.indexOf(entry.target);
+        if(idx>=0){
+          current=idx;
+          numEl.textContent=String(idx+1).padStart(2,'0');
+          barEl.style.width=((idx+1)/total*100)+'%';
+        }
+      }
+    });
+  },{threshold:[0.5],root:deck});
+  slides.forEach(s=>io.observe(s));
+  slides[0].classList.add('in-view');
+
+  function scrollTo(i){
+    i=Math.max(0,Math.min(total-1,i));
+    slides[i].scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  document.getElementById('navUp').addEventListener('click',()=>scrollTo(current-1));
+  document.getElementById('navDown').addEventListener('click',()=>scrollTo(current+1));
+
+  document.addEventListener('keydown',(e)=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='A')return;
+    const k=e.key;
+    if(['ArrowDown','ArrowRight','PageDown',' '].includes(k)){e.preventDefault();scrollTo(current+1);}
+    else if(['ArrowUp','ArrowLeft','PageUp'].includes(k)){e.preventDefault();scrollTo(current-1);}
+    else if(k==='Home'){e.preventDefault();scrollTo(0);}
+    else if(k==='End'){e.preventDefault();scrollTo(total-1);}
+  });
+
+  // CALCULATOR
+  const fmt=n=>n.toLocaleString('ru-RU').replace(/,/g,'\u00A0');
+  const slider=document.getElementById('chSlider');
+  const cChannels=document.getElementById('cChannels');
+  const cArticles=document.getElementById('cArticles');
+  const cMonthly=document.getElementById('cMonthly');
+  const cPerArticle=document.getElementById('cPerArticle');
+  const cDev=document.getElementById('cDev');
+  const cDevMeta=document.getElementById('cDevMeta');
+  const cReachBar=document.getElementById('cReachBar');
+  const cTrafficBar=document.getElementById('cTrafficBar');
+  const cReachLabel=document.getElementById('cReachLabel');
+  const cTrafficLabel=document.getElementById('cTrafficLabel');
+
+  function devCost(n){
+    if(n===1)return{total:140000,perCh:140000,tier:'пилотный режим'};
+    if(n<=10)return{total:75000*n,perCh:75000,tier:'стандартный пакет'};
+    if(n<=20)return{total:70000*n,perCh:70000,tier:'сетевой тариф'};
+    return{total:65000*n,perCh:65000,tier:'промышленный масштаб'};
+  }
+  function reachQual(n){
+    if(n<=2)return 'точечный';
+    if(n<=8)return 'локальный';
+    if(n<=18)return 'промышленный';
+    return 'нишевая монополия';
+  }
+  function trafficQual(n){
+    if(n<=2)return 'десятки/мес';
+    if(n<=8)return 'сотни/мес';
+    if(n<=18)return 'тысячи/мес';
+    return 'десятки тысяч';
+  }
+
+  function updateCalc(n){
+    const articles=240*n;
+    const monthly=n===1?60000:35000*n;
+    const perArticle=Math.round(monthly/articles);
+    const dev=devCost(n);
+
+    cChannels.textContent=n;
+    cArticles.textContent=fmt(articles);
+    cMonthly.textContent=fmt(monthly);
+    cPerArticle.textContent=fmt(perArticle);
+    cDev.textContent=fmt(dev.total);
+    if(n===1){cDevMeta.innerHTML='за&nbsp;канал · '+dev.tier;}
+    else{cDevMeta.innerHTML=fmt(dev.perCh)+'&nbsp;₽ × '+n+'&nbsp;кан. · '+dev.tier;}
+
+    const reachPct=Math.min(100,8+Math.log(n)/Math.log(30)*92);
+    const trafficPct=Math.min(100,5+Math.log(n)/Math.log(30)*95);
+    cReachBar.style.width=reachPct+'%';
+    cTrafficBar.style.width=trafficPct+'%';
+    cReachLabel.textContent=reachQual(n);
+    cTrafficLabel.textContent=trafficQual(n);
+  }
+  slider.addEventListener('input',e=>updateCalc(parseInt(e.target.value)));
+  updateCalc(1);
+}catch(err){
+  console.error('Deck JS error:',err);
+}
+})();
+</script>
+</body>
+</html>
